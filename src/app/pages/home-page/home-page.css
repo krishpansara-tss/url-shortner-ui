@@ -1,0 +1,50 @@
+.home {
+    max-width: 700px;
+    margin: 100px auto;
+    text-align: center;
+    padding: 20px;
+}
+
+.home h1 {
+    margin-bottom: 10px;
+}
+
+.home p {
+    margin-bottom: 30px;
+}
+
+.shortener {
+    display: flex;
+    gap: 10px;
+}
+
+.shortener input {
+    flex: 1;
+}
+
+.result {
+    margin-top: 30px;
+    text-align: left;
+}
+
+.result-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-top: 8px;
+    padding: 10px;
+
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.result-box a {
+    flex: 1;
+}
+
+.short-url {
+    flex: 1;
+    color: var(--color-primary);
+}
