@@ -1,10 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { AuthServices } from '../../../core/services/auth.services';
 import { MessageResponseDto } from '../../../core/dtos/response/MessageResponseDto';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
-  imports: [],
+  imports: [RouterLink],
   selector: 'app-dasboard-page',
   styleUrl: './dasboard-page.css',
   templateUrl: './dasboard-page.html',

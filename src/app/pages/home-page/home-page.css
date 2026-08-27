@@ -1,32 +1,101 @@
 .home {
     max-width: 700px;
     margin: 100px auto;
-    text-align: center;
     padding: 20px;
+    text-align: center;
 }
 
+/* Heading */
 .home h1 {
     margin-bottom: 10px;
 }
 
 .home p {
     margin-bottom: 30px;
+    color: var(--color-text-secondary);
 }
 
+/* URL Shortener */
 .shortener {
+    width: 100%;
+}
+
+.shortener form {
+    width: 100%;
+}
+
+.form-group {
     display: flex;
+    align-items: flex-start;
     gap: 10px;
+    width: 100%;
 }
 
-.shortener input {
+/* Input */
+.form-group input {
     flex: 1;
+    min-width: 0;
+    padding: 12px 14px;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
 }
 
+.form-group input:focus {
+    border-color: var(--color-primary);
+}
+
+/* Button */
+.btn-primary {
+    padding: 12px 18px;
+
+    border: none;
+    border-radius: var(--radius-md);
+
+    background: var(--color-primary);
+    color: white;
+
+    font-size: 14px;
+    cursor: pointer;
+
+    white-space: nowrap;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Validation Error */
+.error {
+    display: block;
+    margin-top: 6px;
+
+    text-align: left;
+    font-size: 13px;
+    color: #d32f2f;
+}
+
+/* Result */
 .result {
     margin-top: 30px;
     text-align: left;
 }
 
+.result>span {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Shortened URL Box */
 .result-box {
     display: flex;
     align-items: center;
@@ -40,11 +109,67 @@
     border-radius: var(--radius-md);
 }
 
-.result-box a {
-    flex: 1;
-}
-
+/* Short URL text */
 .short-url {
     flex: 1;
     color: var(--color-primary);
+    word-break: break-all;
+}
+
+/* Copy button */
+.btn-secondary {
+    padding: 8px 12px;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    background: white;
+    color: var(--color-text);
+
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-secondary:hover {
+    background: #f5f5f5;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+
+    .home {
+        margin: 50px auto;
+        padding: 15px;
+    }
+
+    .form-group {
+        flex-direction: column;
+    }
+
+    .form-group input,
+    .btn-primary {
+        width: 100%;
+    }
+
+    .result-box {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-secondary {
+        width: 100%;
+    }
+}
+
+.url-form {
+    display: flex;
+    gap: 10px;
+}
+
+.url-form input {
+    flex: 1;
+}
+
+.url-form button {
+    white-space: nowrap;
 }

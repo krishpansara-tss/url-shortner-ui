@@ -8,6 +8,7 @@ import { ManagePaymentPage } from './pages/admin/manage-payment-page/manage-paym
 import { SystemConfigPage } from './pages/admin/system-config-page/system-config-page';
 import { HomePage } from './pages/home-page/home-page';
 import { DasboardPage } from './pages/users/dasboard-page/dasboard-page';
+import { Urls } from './pages/urls/urls';
 
 export const routes: Routes = [
   {
@@ -29,7 +30,10 @@ export const routes: Routes = [
     path: 'users',
     component: DasboardPage,
     children: [
-        
+      {
+        path: 'urls',
+        component: Urls
+      }
     ]
   },
 

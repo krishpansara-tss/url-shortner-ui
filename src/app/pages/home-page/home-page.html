@@ -8,13 +8,29 @@
     </p>
 
     <div class="shortener">
+        <form #urlForm="ngForm" (ngSubmit)="shortenUrl(urlForm)" class="url-form">
 
-        <input type="text" placeholder="Enter your long URL" />
+            <input type="url" name="longUrl" [(ngModel)]="longUrl" #url="ngModel" pattern="https?://.+" placeholder="Enter your long URL" required/>
 
-        <button class="btn-primary" (click)="shortenUrl()">
-            Shorten URL
-        </button>
+            @if(url.invalid && url.touched) {
+                
+                @if(url.errors?.['required']){
+                    <small class="error">
+                        URL is required.
+                    </small>
+                }
+                @if (url.errors?.['pattern']) {
+                    <small class="error">
+                        Please enter a valid URL starting with http:// or https://
+                    </small>
+                }
+                
+            }
 
+            <button type="submit" [disabled]="urlForm.invalid" class="btn-primary">
+                Shorten URL
+            </button>
+        </form>
     </div>
 
     <div class="result">

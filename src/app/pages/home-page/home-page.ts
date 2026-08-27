@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Navbar } from '../navbar/navbar';
 import { AuthServices } from '../../core/services/auth.services';
 import { Router } from '@angular/router';
@@ -12,16 +12,26 @@ import { Router } from '@angular/router';
 })
 export class HomePage {
   longUrl = '';
-  shortedUrl = '';
+  shortenedUrl = '';
 
   authService = inject(AuthServices);
-  router = inject(Router)
+  router = inject(Router);
 
-  shortenUrl(){
-    if(!this.authService.isLoggedIn()){
-      alert("Unauthorized!, You have to login first to Shorten the URLs.")
-      this.router.navigate(['login'])
+  shortenUrl(form: NgForm) {
+
+    if(form.invalid) {
+      form.control.markAllAsTouched();
+      return;
     }
-  }
 
+    if (!this.authService.isLoggedIn()) {
+      alert('Unauthorized!, You have to login first to Shorten the URLs.');
+      this.router.navigate(['login']);
+      return;
+    }
+
+    
+
+    console.log('URL is valid:', this.longUrl);
+  }
 }
