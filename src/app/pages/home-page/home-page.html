@@ -1,52 +1,69 @@
 <app-navbar></app-navbar>
-<div class="home">
 
-    <h1>Shorten your URL</h1>
-
-    <p>
-        Make your long URLs short and easy to share.
+<div class="home-container">
+  <div class="hero-section">
+    <h1 class="hero-title">Shorten Your Long URLs</h1>
+    <p class="hero-subtitle">
+      Create short, memorable links easily and track their performance in real-time.
     </p>
 
-    <div class="shortener">
-        <form #urlForm="ngForm" (ngSubmit)="shortenUrl(urlForm)" class="url-form">
-
-            <input type="url" name="longUrl" [(ngModel)]="longUrl" #url="ngModel" pattern="https?://.+" placeholder="Enter your long URL" required/>
-
-            @if(url.invalid && url.touched) {
-                
-                @if(url.errors?.['required']){
-                    <small class="error">
-                        URL is required.
-                    </small>
-                }
-                @if (url.errors?.['pattern']) {
-                    <small class="error">
-                        Please enter a valid URL starting with http:// or https://
-                    </small>
-                }
-                
-            }
-
-            <button type="submit" [disabled]="urlForm.invalid" class="btn-primary">
-                Shorten URL
-            </button>
-        </form>
-    </div>
-
-    <div class="result">
-
-        <span>Your shortened URL</span>
-
-        <div class="result-box">
-            <span class="short-url">
-                shortUrl 
-            </span>
-
-            <button class="btn-secondary">
-                Copy this URL
-            </button>
+    <div class="shortener-card card">
+      <form #urlForm="ngForm" (ngSubmit)="shortenUrl(urlForm)" class="url-form">
+        <div class="input-group">
+          <input
+            type="url"
+            name="longUrl"
+            [(ngModel)]="longUrl"
+            #url="ngModel"
+            pattern="https?://.+"
+            placeholder="Paste a long URL here (e.g. https://example.com/very/long/path)..."
+            required
+            class="url-input"
+          />
+          <button type="submit" [disabled]="urlForm.invalid || isLoading" class="btn-primary btn-submit">
+            {{ isLoading ? 'Shortening...' : 'Shorten URL' }}
+          </button>
         </div>
 
-    </div>
+        @if (url.invalid && url.touched) {
+          @if (url.errors?.['required']) {
+            <small class="error-msg">URL is required.</small>
+          }
+          @if (url.errors?.['pattern']) {
+            <small class="error-msg">Please enter a valid URL starting with http:// or https://</small>
+          }
+        }
+      </form>
 
+      @if (!isLoggedIn()) {
+        <p class="guest-notice">
+          Note: You must <a routerLink="/login">Login</a> or <a routerLink="/register">Sign Up</a> to shorten links.
+        </p>
+      }
+
+      @if (errorMessage) {
+        <div class="alert alert-error">
+          {{ errorMessage }}
+        </div>
+      }
+
+      @if (createdUrl) {
+        <div class="result-box">
+          <div class="result-label">Your Shortened URL:</div>
+          <div class="result-content">
+            <a [href]="getDisplayShortUrl(createdUrl.shortUrl)" target="_blank" rel="noopener noreferrer" class="short-link">
+              {{ getDisplayShortUrl(createdUrl.shortUrl) }}
+            </a>
+            <button (click)="copyToClipboard(createdUrl.shortUrl)" class="btn-secondary">
+              {{ copied ? 'Copied!' : 'Copy Link' }}
+            </button>
+          </div>
+          <div class="result-meta">
+            <span>Original URL: <span class="long-link-preview">{{ createdUrl.longUrl }}</span></span>
+            <a routerLink="/users/urls" class="dashboard-link">Manage all links -></a>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
 </div>

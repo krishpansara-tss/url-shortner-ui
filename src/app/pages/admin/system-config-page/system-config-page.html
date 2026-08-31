@@ -1,1 +1,72 @@
-<p>system-config-page works!</p>
+<div class="card">
+  <div class="list-header">
+    <div>
+      <h2>System Limits & Pricing Configuration</h2>
+      <p class="subtitle-sm">Manage global default URL quotas, visit limits, and pricing</p>
+    </div>
+    <button (click)="loadConfig()" class="btn-refresh" title="Reload Settings">Reload Settings</button>
+  </div>
+
+  @if (successMessage) {
+  <div class="alert alert-success mb-3">
+    {{ successMessage }}
+  </div>
+  }
+
+  @if (errorMessage) {
+  <div class="alert alert-error mb-3">
+    {{ errorMessage }}
+  </div>
+  }
+
+  @if (isLoading) {
+  <div class="loading-state">
+    <p>Loading system configuration...</p>
+  </div>
+  } @else {
+  <form (ngSubmit)="saveConfig()" class="config-form">
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Free URL Quota Per User</label>
+        <input type="number" [(ngModel)]="configForm.freeUrlQuotaPerUser" name="freeUrlQuotaPerUser"
+          class="form-control" min="0" required />
+        <small class="form-help">Default number of free short links assigned to newly registered users</small>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Max Visit Limit Per Free URL</label>
+        <input type="number" [(ngModel)]="configForm.maxVisitsPerFreeUrl" name="maxVisitsPerFreeUrl"
+          class="form-control" min="1" required />
+        <small class="form-help">Maximum redirect visits allowed for free links before expiration</small>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Price Per Additional URL Slot (₹)</label>
+        <input type="number" [(ngModel)]="configForm.pricePerAdditionalSlot" name="pricePerAdditionalSlot"
+          class="form-control" step="0.01" min="0" required />
+        <small class="form-help">Amount charged to users purchasing extra URL slots</small>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">URL Renewal Fee (₹)</label>
+        <input type="number" [(ngModel)]="configForm.renewalFee" name="renewalFee" class="form-control" step="0.01"
+          min="0" required />
+        <small class="form-help">Amount charged to users renewing expired short links</small>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Visits Granted On Renewal</label>
+        <input type="number" [(ngModel)]="configForm.renewalVisitsGranted" name="renewalVisitsGranted"
+          class="form-control" min="1" required />
+        <small class="form-help">Additional visit quota credited upon link renewal</small>
+      </div>
+    </div>
+
+    <div class="form-footer mt-4">
+      <button type="submit" class="btn-primary btn-save" [disabled]="isSaving">
+        {{ isSaving ? 'Saving Configuration...' : 'Save Configuration Changes' }}
+      </button>
+    </div>
+  </form>
+  }
+</div>

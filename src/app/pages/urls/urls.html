@@ -1,1 +1,264 @@
-<p>urls works!</p>
+<app-navbar></app-navbar>
+
+<div class="urls-container">
+  <div class="header-section">
+    <div>
+      <h1>My Shortened URLs</h1>
+      <p class="subtitle">Create and manage your short links</p>
+    </div>
+    <button (click)="buyExtraSlot()" class="btn-primary btn-slot" title="Purchase extra URL slot">
+      Increase URL Limit (+1 Slot)
+    </button>
+  </div>
+
+  <!-- Create URL Card -->
+  <div class="card create-card">
+    <div class="tab-header">
+      <button 
+        type="button" 
+        class="tab-btn" 
+        [class.active]="activeTab === 'standard'"
+        (click)="activeTab = 'standard'">
+        Standard Shortener
+      </button>
+      <button 
+        type="button" 
+        class="tab-btn" 
+        [class.active]="activeTab === 'custom'"
+        (click)="activeTab = 'custom'">
+        Custom Alias
+      </button>
+    </div>
+
+    <form (ngSubmit)="createUrl()" class="create-form">
+      <div class="form-row">
+        <div class="input-wrapper">
+          <input
+            type="url"
+            [(ngModel)]="longUrlInput"
+            name="longUrlInput"
+            placeholder="Paste your long URL here..."
+            required
+            class="form-control"
+          />
+        </div>
+
+        @if (activeTab === 'custom') {
+          <div class="input-wrapper custom-alias-wrapper">
+            <input
+              type="text"
+              [(ngModel)]="customAliasInput"
+              name="customAliasInput"
+              placeholder="Custom alias (e.g. my-link)"
+              required
+              class="form-control"
+            />
+          </div>
+        }
+
+        <button 
+          type="submit" 
+          [disabled]="!longUrlInput || (activeTab === 'custom' && !customAliasInput) || isCreating"
+          class="btn-primary">
+          {{ isCreating ? 'Creating...' : 'Shorten' }}
+        </button>
+      </div>
+    </form>
+
+    @if (successMessage) {
+      <div class="alert alert-success mt-2">
+        {{ successMessage }}
+      </div>
+    }
+
+    @if (errorMessage) {
+      <div class="alert alert-error mt-2">
+        {{ errorMessage }}
+      </div>
+    }
+  </div>
+
+  <!-- URLs Table / List -->
+  <div class="card list-card mt-4">
+    <div class="list-header">
+      <h2>Your Links ({{ totalElements }})</h2>
+      <button (click)="loadUserUrls(currentPage)" class="btn-refresh" title="Refresh list">
+        Refresh
+      </button>
+    </div>
+
+    @if (errorMessage) {
+      <div class="alert alert-error mb-3">
+        {{ errorMessage }}
+      </div>
+    }
+
+    @if (isLoading) {
+      <div class="loading-state">
+        <p>Loading your URLs...</p>
+      </div>
+    } @else if (urlsList.length === 0) {
+      <div class="empty-state">
+        <p>No URLs created yet. Shorten your first link above!</p>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="urls-table">
+          <thead>
+            <tr>
+              <th>Short URL</th>
+              <th>Original URL</th>
+              <th>Visits</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (url of urlsList; track url.urlId) {
+              <tr>
+                <td class="col-short">
+                  <a [href]="getDisplayShortUrl(url.shortUrl)" target="_blank" rel="noopener noreferrer" class="short-url-link">
+                    {{ getDisplayShortUrl(url.shortUrl) }}
+                  </a>
+                  <button 
+                    (click)="copyToClipboard(url)" 
+                    class="btn-icon" 
+                    [title]="copiedId === url.urlId ? 'Copied!' : 'Copy to clipboard'">
+                    {{ copiedId === url.urlId ? 'Copied' : 'Copy' }}
+                  </button>
+                </td>
+                <td class="col-long">
+                  <span class="long-url-text" [title]="url.longUrl">
+                    {{ url.longUrl }}
+                  </span>
+                </td>
+                <td class="col-visits">
+                  <span class="visit-count">{{ url.totalVisits || 0 }}</span>
+                  @if (url.visitLimit) {
+                    <small class="visit-limit"> / {{ url.visitLimit }}</small>
+                  }
+                </td>
+                <td class="col-status">
+                  <span class="badge" 
+                    [class.badge-active]="url.urlStatus === 'ACTIVE'" 
+                    [class.badge-deleted]="url.urlStatus === 'DELETED'"
+                    [class.badge-inactive]="url.urlStatus !== 'ACTIVE' && url.urlStatus !== 'DELETED'">
+                    {{ url.urlStatus }}
+                  </span>
+                </td>
+                <td class="col-date">
+                  {{ url.createdAt | date:'shortDate' }}
+                </td>
+                <td class="col-actions">
+                  @if (url.urlStatus === 'ACTIVE') {
+                    <button 
+                      (click)="deleteUrl(url)" 
+                      class="btn-sm btn-danger"
+                      title="Delete URL">
+                      Delete
+                    </button>
+                  } @else {
+                    <button 
+                      (click)="activateUrl(url)" 
+                      class="btn-sm btn-primary"
+                      title="Activate URL">
+                      Activate
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      @if (totalPages > 1) {
+        <div class="pagination">
+          <button 
+            (click)="goToPage(currentPage - 1)" 
+            [disabled]="currentPage === 0"
+            class="btn-page">
+            &lt; Prev
+          </button>
+          
+          <span class="page-info">
+            Page {{ currentPage + 1 }} of {{ totalPages }}
+          </span>
+
+          <button 
+            (click)="goToPage(currentPage + 1)" 
+            [disabled]="currentPage >= totalPages - 1"
+            class="btn-page">
+            Next &gt;
+          </button>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Payment Approval Screen Overlay -->
+  @if (pendingPayment) {
+    <div class="modal-overlay">
+      <div class="modal-card payment-approval-card">
+        <div class="modal-header">
+          <h3>Approve Payment for Custom URL</h3>
+          <button (click)="cancelPendingPayment()" class="btn-close" title="Close">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          @if (modalErrorMessage) {
+            <div class="alert alert-error mb-3">
+              {{ modalErrorMessage }}
+            </div>
+          }
+
+          <p class="modal-desc">
+            Your custom short link has been reserved in <strong>INACTIVE</strong> state. Please approve the payment to process and activate your link.
+          </p>
+
+          <div class="invoice-box">
+            <div class="invoice-row">
+              <span class="invoice-label">Payment ID</span>
+              <span class="invoice-val">#{{ pendingPayment.paymentId }}</span>
+            </div>
+            <div class="invoice-row">
+              <span class="invoice-label">Custom Alias</span>
+              <span class="invoice-val highlight-alias">{{ lastCustomAlias || 'Custom Link' }}</span>
+            </div>
+            <div class="invoice-row">
+              <span class="invoice-label">Target URL</span>
+              <span class="invoice-val long-url-preview" [title]="lastLongUrl">{{ lastLongUrl }}</span>
+            </div>
+            <div class="invoice-row">
+              <span class="invoice-label">Payment Status</span>
+              <span class="badge badge-warning">{{ pendingPayment.paymentStatus }}</span>
+            </div>
+            <div class="invoice-row invoice-total">
+              <span class="invoice-label">Total Amount</span>
+              <span class="invoice-amount">${{ pendingPayment.amount }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button 
+            type="button"
+            (click)="cancelPendingPayment()" 
+            class="btn-secondary" 
+            [disabled]="isProcessingPayment">
+            Cancel
+          </button>
+          <button 
+            type="button"
+            (click)="approvePayment()" 
+            class="btn-primary btn-approve" 
+            [disabled]="isProcessingPayment">
+            {{ isProcessingPayment ? 'Processing Payment...' : 'Approve Payment & Activate URL' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

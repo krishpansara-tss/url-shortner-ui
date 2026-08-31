@@ -1,1 +1,120 @@
-<p>manage-payment-page works!</p>
+<!-- Revenue Analytics Stats Cards -->
+<div class="kpi-grid mb-4">
+  <div class="kpi-card">
+    <div class="kpi-title">Total Revenue</div>
+    <div class="kpi-val">₹{{ stats['totalRevenue'] || 0 }}</div>
+    <div class="kpi-sub">Lifetime earnings from features</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-title">Total Transactions</div>
+    <div class="kpi-val">{{ stats['totalPayments'] || 0 }}</div>
+    <div class="kpi-sub">All initiated payment attempts</div>
+  </div>
+
+  <div class="kpi-card kpi-success">
+    <div class="kpi-title">Successful Payments</div>
+    <div class="kpi-val">{{ stats['successfulPayments'] || 0 }}</div>
+    <div class="kpi-sub">Completed transactions</div>
+  </div>
+
+  <div class="kpi-card kpi-warning">
+    <div class="kpi-title">Pending Payments</div>
+    <div class="kpi-val">{{ stats['pendingPayments'] || 0 }}</div>
+    <div class="kpi-sub">Awaiting checkout completion</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="list-header">
+    <div>
+      <h2>Payment History & Revenue Log</h2>
+      <p class="subtitle-sm">Filter and audit all transaction logs across users</p>
+    </div>
+
+    <!-- Status Filter Buttons -->
+    <div class="filter-tabs">
+      <button (click)="filterByStatus('ALL')" class="btn-filter" [class.active]="selectedStatus === 'ALL'">All</button>
+      <button (click)="filterByStatus('SUCCESS')" class="btn-filter"
+        [class.active]="selectedStatus === 'SUCCESS'">Success</button>
+      <button (click)="filterByStatus('PENDING')" class="btn-filter"
+        [class.active]="selectedStatus === 'PENDING'">Pending</button>
+      <button (click)="filterByStatus('CANCELLED')" class="btn-filter"
+        [class.active]="selectedStatus === 'CANCELLED'">Cancelled</button>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+  <div class="alert alert-error mb-3">
+    {{ errorMessage }}
+  </div>
+  }
+
+  @if (isLoading) {
+  <div class="loading-state">
+    <p>Loading payment transactions...</p>
+  </div>
+  } @else if (paymentsList.length === 0) {
+  <div class="empty-state">
+    <p>No payment records found for status "{{ selectedStatus }}".</p>
+  </div>
+  } @else {
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Payment ID</th>
+          <th>User ID</th>
+          <th>Feature / Type</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Transaction ID</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (payment of paymentsList; track payment.paymentId) {
+        <tr>
+          <td class="col-id">#{{ payment.paymentId }}</td>
+          <td class="col-user">User #{{ payment.userId }}</td>
+          <td class="col-type">
+            <span class="type-tag">{{ payment.paymentType }}</span>
+          </td>
+          <td class="col-amount">₹{{ payment.amount }}</td>
+          <td class="col-status">
+            <span class="badge" [class.badge-active]="payment.paymentStatus === 'SUCCESS'"
+              [class.badge-warning]="payment.paymentStatus === 'PENDING'"
+              [class.badge-deleted]="payment.paymentStatus === 'CANCELLED' || payment.paymentStatus === 'FAILED'">
+              {{ payment.paymentStatus }}
+            </span>
+          </td>
+          <td class="col-txn">
+            <span class="txn-code">{{ payment.transactionId || '-' }}</span>
+          </td>
+          <td class="col-date">
+            {{ payment.createdAt | date:'medium' }}
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  @if (totalPages > 1) {
+  <div class="pagination">
+    <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 0" class="btn-page">
+      &lt; Prev
+    </button>
+
+    <span class="page-info">
+      Page {{ currentPage + 1 }} of {{ totalPages }}
+    </span>
+
+    <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage >= totalPages - 1" class="btn-page">
+      Next &gt;
+    </button>
+  </div>
+  }
+  }
+</div>

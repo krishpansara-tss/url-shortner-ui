@@ -9,6 +9,8 @@ import { SystemConfigPage } from './pages/admin/system-config-page/system-config
 import { HomePage } from './pages/home-page/home-page';
 import { DasboardPage } from './pages/users/dasboard-page/dasboard-page';
 import { Urls } from './pages/urls/urls';
+import { authGuard } from './core/guards/auth.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -29,34 +31,56 @@ export const routes: Routes = [
   {
     path: 'users',
     component: DasboardPage,
+    canActivate: [authGuard],
     children: [
       {
+        path: '',
+        redirectTo: 'urls',
+        pathMatch: 'full',
+      },
+      {
         path: 'urls',
-        component: Urls
-      }
-    ]
+        component: Urls,
+        canActivate: [authGuard],
+      },
+    ],
   },
 
   {
     path: 'admin',
     component: AdminDasboardPage,
+    canActivate: [adminGuard],
     children: [
+      {
+        path: '',
+        redirectTo: 'manage-users',
+        pathMatch: 'full',
+      },
       {
         path: 'manage-urls',
         component: ManageUrlsPage,
+        canActivate: [adminGuard],
       },
       {
         path: 'manage-users',
         component: ManageUsersPage,
+        canActivate: [adminGuard],
       },
       {
         path: 'manage-payments',
         component: ManagePaymentPage,
+        canActivate: [adminGuard],
       },
       {
         path: 'manage-system-config',
         component: SystemConfigPage,
+        canActivate: [adminGuard],
       },
     ],
+  },
+
+  {
+    path: '**',
+    redirectTo: '',
   },
 ];

@@ -1,1 +1,125 @@
-<p>manage-users-page works!</p>
+<div class="card">
+  <div class="list-header">
+    <div>
+      <h2>Registered Users ({{ usersList.length }})</h2>
+      <p class="subtitle-sm">Manage user accounts, roles, and URL limits</p>
+    </div>
+    <button (click)="loadUsers()" class="btn-refresh" title="Refresh Users">Refresh List</button>
+  </div>
+
+  @if (successMessage) {
+    <div class="alert alert-success mb-3">
+      {{ successMessage }}
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="alert alert-error mb-3">
+      {{ errorMessage }}
+    </div>
+  }
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <p>Loading user accounts...</p>
+    </div>
+  } @else if (usersList.length === 0) {
+    <div class="empty-state">
+      <p>No user accounts found in the database.</p>
+    </div>
+  } @else {
+    <div class="table-responsive">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>URL Slots</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of usersList; track user.userId) {
+            <tr>
+              <td class="col-id">#{{ user.userId }}</td>
+              <td class="col-name">
+                <strong>{{ user.name }}</strong>
+              </td>
+              <td class="col-email">{{ user.email }}</td>
+              <td class="col-role">
+                <span class="badge" [class.badge-admin-role]="user.role === 'ADMIN'" [class.badge-user-role]="user.role !== 'ADMIN'">
+                  {{ user.role }}
+                </span>
+              </td>
+              <td class="col-status">
+                <span class="badge" [class.badge-active]="user.status === 'ACTIVE'" [class.badge-deleted]="user.status !== 'ACTIVE'">
+                  {{ user.status }}
+                </span>
+              </td>
+              <td class="col-slots">
+                <span class="slots-count">{{ user.remainingUrlSlots ?? 0 }} slots</span>
+              </td>
+              <td class="col-actions">
+                <button (click)="openEditModal(user)" class="btn-sm btn-outline">Edit</button>
+                <button 
+                  (click)="toggleUserStatus(user)" 
+                  class="btn-sm" 
+                  [class.btn-danger]="user.status === 'ACTIVE'"
+                  [class.btn-primary]="user.status !== 'ACTIVE'">
+                  {{ user.status === 'ACTIVE' ? 'Suspend' : 'Activate' }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- Edit User Modal -->
+  @if (selectedUser) {
+    <div class="modal-overlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Edit User #{{ selectedUser.userId }}</h3>
+          <button (click)="closeEditModal()" class="btn-close">&times;</button>
+        </div>
+
+        <form (ngSubmit)="saveUserChanges()" class="modal-body">
+          <div class="form-group mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" [(ngModel)]="editForm.name" name="name" class="form-control" required />
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label">Email Address</label>
+            <input type="email" [(ngModel)]="editForm.email" name="email" class="form-control" required />
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label">Role</label>
+            <select [(ngModel)]="editForm.role" name="role" class="form-control">
+              <option value="USER">USER</option>
+              <option value="ADMIN">ADMIN</option>
+            </select>
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label">Remaining URL Slots</label>
+            <input type="number" [(ngModel)]="editForm.remainingUrlSlots" name="remainingUrlSlots" class="form-control" min="0" required />
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" (click)="closeEditModal()" class="btn-secondary" [disabled]="isUpdating">Cancel</button>
+            <button type="submit" class="btn-primary" [disabled]="isUpdating">
+              {{ isUpdating ? 'Saving...' : 'Save Changes' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

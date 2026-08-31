@@ -1,29 +1,20 @@
 <nav class="navbar">
+  <div class="logo">
+    <a routerLink="/" class="logo-link">ShortURL</a>
+  </div>
 
-    <div class="logo">
-        ShortURL
-    </div>
+  <div class="nav-links">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
 
-    <div class="nav-links">
-        <a routerLink="/">Home</a>
-        <a routerLink="/users">My URLs</a>
-        @if (isLoggedIn()) {
-        
-            <a routerLink="/users">
-                Dashboard
-            </a>
-        
-        } @else {
-        
-            <a routerLink="/login">
-                Login
-            </a>
-            
-            <a routerLink="/register" class="signup">
-                Sign Up
-            </a>
-        
-        }
-    </div>
-
+    @if (isLoggedIn()) {
+      <a routerLink="/users/urls" routerLinkActive="active">My URLs</a>
+      @if (isAdmin()) {
+        <a routerLink="/admin/manage-urls" routerLinkActive="active" class="admin-link">Admin Panel</a>
+      }
+      <button (click)="logout()" class="btn-logout">Logout</button>
+    } @else {
+      <a routerLink="/login" routerLinkActive="active">Login</a>
+      <a routerLink="/register" class="signup">Sign Up</a>
+    }
+  </div>
 </nav>

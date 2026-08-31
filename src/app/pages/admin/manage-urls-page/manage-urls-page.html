@@ -1,1 +1,116 @@
-<p>manage-urls-page works!</p>
+<div class="card">
+  <div class="list-header">
+    <div>
+      <h2>Global System URLs ({{ totalElements }})</h2>
+      <p class="subtitle-sm">View and override short URL statuses across all users</p>
+    </div>
+    <button (click)="loadAllUrls(currentPage)" class="btn-refresh" title="Refresh URLs">Refresh List</button>
+  </div>
+
+  @if (successMessage) {
+    <div class="alert alert-success mb-3">
+      {{ successMessage }}
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="alert alert-error mb-3">
+      {{ errorMessage }}
+    </div>
+  }
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <p>Loading global URLs...</p>
+    </div>
+  } @else if (urlsList.length === 0) {
+    <div class="empty-state">
+      <p>No shortened URLs created in the system yet.</p>
+    </div>
+  } @else {
+    <div class="table-responsive">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Short Link</th>
+            <th>Original Long URL</th>
+            <th>Visits</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Admin Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (url of urlsList; track url.urlId) {
+            <tr>
+              <td class="col-short">
+                <a [href]="getDisplayShortUrl(url.shortUrl)" target="_blank" rel="noopener noreferrer" class="short-url-link">
+                  {{ getDisplayShortUrl(url.shortUrl) }}
+                </a>
+                <button 
+                  (click)="copyToClipboard(url)" 
+                  class="btn-icon" 
+                  [title]="copiedId === url.urlId ? 'Copied!' : 'Copy to clipboard'">
+                  {{ copiedId === url.urlId ? 'Copied' : 'Copy' }}
+                </button>
+              </td>
+              <td class="col-long">
+                <span class="long-url-text" [title]="url.longUrl">
+                  {{ url.longUrl }}
+                </span>
+              </td>
+              <td class="col-visits">
+                <span class="visit-count">{{ url.totalVisits || 0 }}</span>
+                @if (url.visitLimit) {
+                  <small class="visit-limit"> / {{ url.visitLimit }}</small>
+                }
+              </td>
+              <td class="col-status">
+                <span class="badge" 
+                  [class.badge-active]="url.urlStatus === 'ACTIVE'" 
+                  [class.badge-deleted]="url.urlStatus === 'DELETED'"
+                  [class.badge-inactive]="url.urlStatus !== 'ACTIVE' && url.urlStatus !== 'DELETED'">
+                  {{ url.urlStatus }}
+                </span>
+              </td>
+              <td class="col-date">
+                {{ url.createdAt | date:'shortDate' }}
+              </td>
+              <td class="col-actions">
+                <select [value]="url.urlStatus" (change)="changeStatus(url, $event)" class="select-status">
+                  <option value="ACTIVE">ACTIVE</option>
+                  <option value="INACTIVE">INACTIVE</option>
+                  <option value="EXPIRED">EXPIRED</option>
+                  <option value="DELETED">DELETED</option>
+                </select>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages > 1) {
+      <div class="pagination">
+        <button 
+          (click)="goToPage(currentPage - 1)" 
+          [disabled]="currentPage === 0"
+          class="btn-page">
+          &lt; Prev
+        </button>
+        
+        <span class="page-info">
+          Page {{ currentPage + 1 }} of {{ totalPages }}
+        </span>
+
+        <button 
+          (click)="goToPage(currentPage + 1)" 
+          [disabled]="currentPage >= totalPages - 1"
+          class="btn-page">
+          Next &gt;
+        </button>
+      </div>
+    }
+  }
+</div>

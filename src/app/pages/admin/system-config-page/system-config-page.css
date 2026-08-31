@@ -1,0 +1,74 @@
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.list-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.subtitle-sm {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.btn-refresh {
+  background: white;
+  border: 1px solid var(--color-border-dark);
+  font-size: 13px;
+  padding: 6px 12px;
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.btn-refresh:hover {
+  background: var(--color-background);
+}
+
+.config-form {
+  max-width: 800px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+  border: 1px solid var(--color-border-dark);
+  border-radius: var(--radius-sm);
+}
+
+.form-help {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.btn-save {
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.mt-4 { margin-top: 24px; }
